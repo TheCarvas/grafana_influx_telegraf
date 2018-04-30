@@ -8,6 +8,7 @@ services:
     volumes:
       - /proc:/mnt/proc:ro
       - ./collectd.conf:/etc/collectd/collectd.conf
+    restart: always
   influxdb:
     image: influxdb:1.0
     ports:
@@ -18,9 +19,27 @@ services:
       - /var/lib/influxdb
       - ./influxdb.conf:/etc/influxdb/influxdb.conf
       - ./types.db:/usr/share/collectd/types.db:ro
+    restart: always
+  telegraf:
+    image: telegraf:latest
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf
+      - ./snmp1.conf:/etc/telegraf/telegraf.d/snmp1.conf
+      - ./MIBS:/root/.snmp/mibs
+#      - ./MIBS:/usr/share/snmp/mibs
+#      - ./IF-MIB.txt:/usr/share/snmp/mibs/IF-MIB.txt
+#      - ./FORTINET-CORE-MIB.txt:/usr/share/snmp/mibs/FORTINET-CORE-MIB.txt
+#      - ./FORTINET-FORTIGATE-MIB.txt:/usr/share/snmp/mibs/FORTINET-FORTIGATE-MIB.txt
+      - /var/run/docker.sock:/var/run/docker.sock
+#    command:
+#       - -config /etc/telegraf/telegraf.conf
+#       - --config-directory /etc/telegraf/telegraf.d
+    restart: always
   grafana:
     image: grafana/grafana:3.1.1
     ports:
       - "3000:3000"
     volumes:
       - /var/lib/grafana
+    restart: always
+
